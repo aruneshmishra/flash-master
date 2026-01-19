@@ -1,5 +1,4 @@
 export default function initMatch(state, container) {
-    container.innerHTML = ''; // Clear previous game if resetting
     const wrapper = document.createElement('div');
     wrapper.className = 'match-mode';
     container.appendChild(wrapper);
@@ -124,7 +123,9 @@ export default function initMatch(state, container) {
             const winDiv = document.getElementById('match-complete');
             winDiv.classList.remove('hidden');
             document.getElementById('reset-match').addEventListener('click', () => {
-                initMatch(state, container);
+                // Trigger global mode switch to ensure clean reset
+                const matchBtn = document.querySelector('.mode-btn[data-mode="match"]');
+                if (matchBtn) matchBtn.click();
             });
             // Hide grid to clean up or overlay?
             wrapper.querySelector('.match-grid').style.opacity = '0.5';
