@@ -1,4 +1,4 @@
-export default function initMatch(state, container) {
+export default function initMatch(state, container, onNavigate) {
     const wrapper = document.createElement('div');
     wrapper.className = 'match-mode';
     container.appendChild(wrapper);
@@ -124,8 +124,7 @@ export default function initMatch(state, container) {
             winDiv.classList.remove('hidden');
             document.getElementById('reset-match').addEventListener('click', () => {
                 // Trigger global mode switch to ensure clean reset
-                const matchBtn = document.querySelector('.mode-btn[data-mode="match"]');
-                if (matchBtn) matchBtn.click();
+                if (onNavigate) onNavigate('match');
             });
             // Hide grid to clean up or overlay?
             wrapper.querySelector('.match-grid').style.opacity = '0.5';

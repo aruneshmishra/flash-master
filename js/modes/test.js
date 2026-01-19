@@ -1,4 +1,4 @@
-export default function initTest(state, container) {
+export default function initTest(state, container, onNavigate) {
     const wrapper = document.createElement('div');
     wrapper.className = 'test-mode';
     container.appendChild(wrapper);
@@ -103,10 +103,8 @@ export default function initTest(state, container) {
         resultsContainer.classList.remove('hidden');
 
         document.getElementById('retry-btn').addEventListener('click', () => {
-            setTimeout(() => {
-                const testBtn = document.querySelector('.mode-btn[data-mode="test"]');
-                if (testBtn) testBtn.click();
-            }, 10);
+            // Call the navigation function directly to reset
+            if (onNavigate) onNavigate('test');
         });
 
         // Scroll to results

@@ -51,7 +51,7 @@ export default function initUI(state) {
 
         // Render Mode
         if (modes[modeName]) {
-            modes[modeName](state, modeContainer);
+            modes[modeName](state, modeContainer, switchMode);
         }
     }
 }
