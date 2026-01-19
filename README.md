@@ -18,11 +18,9 @@ FlashMaster turns any Google Sheet into a powerful study app. You create the dat
     *   *Column B (Answer):* The back of the card / the solution.
 
 ### Step 2: Publish Your Sheet
-For the app to read your data, you must make it publicly accessible via CSV.
 1.  In your Google Sheet, go to **File > Share > Publish to web**.
-2.  Change "Web page" to **Comma-separated values (.csv)**.
-3.  Click **Publish**.
-4.  Copy the link provided (or just copy your browser's URL bar link).
+2.  Click **Publish**.
+3.  Copy the link provided (or just copy your browser's URL bar link).
 
 ### Step 3: Start Studying
 1.  Open **[FlashMaster](https://aruneshmishra.github.io/flash-master/)**.
