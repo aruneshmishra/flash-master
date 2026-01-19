@@ -75,31 +75,38 @@ body {
 /* Dashboard View */
 header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     padding-bottom: 20px;
     border-bottom: 1px solid var(--border-color);
     margin-bottom: 20px;
     flex-wrap: wrap;
-    /* Allow wrapping for subtitle */
+    position: relative;
+    text-align: center;
 }
 
 /* App View specific header tweaks */
 #app-view header {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    align-items: center;
-    gap: 0 15px;
+    display: flex;
+    justify-content: center;
 }
 
 #back-to-dashboard {
-    grid-row: 1 / span 2;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(calc(-50% - 10px));
 }
 
 #deck-title {
     margin: 0;
     line-height: 1.2;
+}
+
+.header-title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .deck-subtitle {
