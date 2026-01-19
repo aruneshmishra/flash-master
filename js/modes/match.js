@@ -3,8 +3,8 @@ export default function initMatch(state, container, onNavigate) {
     wrapper.className = 'match-mode';
     container.appendChild(wrapper);
 
-    // Limit to 6 pairs (12 cards) for UI sanity, randomized
-    const matchSize = Math.min(6, state.deck.length);
+    // Limit to 8 pairs (16 cards) for 4x4 grid
+    const matchSize = Math.min(8, state.deck.length);
     const gameSet = [...state.deck].sort(() => 0.5 - Math.random()).slice(0, matchSize);
 
     // Create indivudal cards for questions and answers
