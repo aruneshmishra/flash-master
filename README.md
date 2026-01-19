@@ -1,67 +1,55 @@
 # FlashMaster
 
-**FlashMaster** is a modern, single-page web application designed to help you master any subject through flashcards, interactive tests, and games. Built with vanilla JavaScript, HTML5, and CSS3, it offers a fast and responsive experience purely in the browser.
+**FlashMaster** is a free, simple way to master any subject using flashcards, quizzes, and games.
 
-## Features
+👉 **[Open FlashMaster App](https://aruneshmishra.github.io/flash-master/)**
 
-- **Dynamic Data Loading**: Load flashcard decks directly from any public Google Sheet.
-- **Four Study Modes**:
-  - **🃏 Flashcards**: Classic study mode with 3D flip animations.
-  - **🧠 Learn**: Multiple-choice questions to reinforce memory.
-  - **📝 Test**: Type-in answers to test your full recall.
-  - **🧩 Match**: A timed game to match questions with their answers.
-- **Responsive Design**: Works on desktop, tablet, and mobile devices.
+---
 
-## Setup & Installation
+## How it Works
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/aruneshmishra/flash-master.git
-   cd flash-master
-   ```
+FlashMaster turns any Google Sheet into a powerful study app. You create the data, and FlashMaster provides the interface to study it.
 
-2. **Run the Application**
-   - You can serve the files using any static file server.
-   - **Using Python:**
-     ```bash
-     # Python 3
-     python -m http.server 8000
-     ```
-   - Open your browser to `http://localhost:8000`.
+### Step 1: Create Your Flashcards
+1.  Create a new **Google Sheet**.
+2.  In the first row, add two headers: `Question` and `Answer`.
+3.  Fill in your rows with the content you want to learn.
+    *   *Column A (Question):* The front of the card / the prompt.
+    *   *Column B (Answer):* The back of the card / the solution.
 
-## User Guide
+### Step 2: Publish Your Sheet
+For the app to read your data, you must make it publicly accessible via CSV.
+1.  In your Google Sheet, go to **File > Share > Publish to web**.
+2.  Change "Web page" to **Comma-separated values (.csv)**.
+3.  Click **Publish**.
+4.  Copy the link provided (or just copy your browser's URL bar link).
 
-### 1. Preparing Your Data
-FlashMaster loads decks from Google Sheets.
-1. Create a new Google Sheet.
-2. The **first row** must be headers: `Question` and `Answer` (case-insensitive).
-3. Add your content in the rows below.
-4. Click **Share** -> Change to **"Anyone with the link"** -> **Viewer**.
-5. Copy the URL.
+### Step 3: Start Studying
+1.  Open **[FlashMaster](https://aruneshmishra.github.io/flash-master/)**.
+2.  Paste your Google Sheet link into the box.
+3.  Click **Load Deck**.
 
-### 2. Loading a Deck
-1. Paste your **Google Sheet URL** into the input field on the home screen.
-2. Click **Load Deck**.
+---
 
-### 3. Study Modes
+## Study Modes
 
-#### Flashcards
-- Click the card to flip it.
-- Use the **Next** and **Previous** buttons to navigate through the deck.
+### 🃏 Flashcards
+The classic way to study. Click any card to flip it over and see the answer. Use the Next/Previous buttons to move through your deck.
 
-#### Learn Mode
-- You will be presented with a question and multiple choices.
-- Select the correct answer. The app will visually indicate if you are right or wrong.
+### 🧠 Learn Mode
+Test your recognition. You will be shown a question and must select the correct answer from multiple choices. The app gives you instant feedback.
 
-#### Test Mode
-- Type the answer to the question in the input box.
-- Submit to see if you are correct. This mode requires exact text matching (case-insensitive trims applied).
+### 📝 Test Mode
+Test your recall. Type the exact answer to the question.
+*   **Text questions**: Type the answer.
+*   **Multiple choice**: Occasionally mixed in for variety.
+*   Get a score at the end and retry as many times as you like.
 
-#### Match Game
-- You will see a grid of Cards (Questions) and Answers.
-- Click a Question card, then click its corresponding Answer card.
-- If they match, they disappear. Clear the board!
+### 🧩 Match Game
+A race against the clock!
+*   You will see a grid of mixed-up Questions and Answers.
+*   Tap a Question, then tap its matching Answer.
+*   Clear the board as fast as you can.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+---
+*Created by [Arunesh Mishra](https://aruneshmishra.github.io/). Licensed under MIT.*
