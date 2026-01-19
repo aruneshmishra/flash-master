@@ -1,4 +1,5 @@
 export default function initMatch(state, container) {
+    container.innerHTML = ''; // Clear previous game if resetting
     const wrapper = document.createElement('div');
     wrapper.className = 'match-mode';
     container.appendChild(wrapper);
