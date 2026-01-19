@@ -4,10 +4,15 @@ export default function initData(state) {
     const dashboardView = document.getElementById('dashboard-view');
     const appView = document.getElementById('app-view');
 
+    const statusMsg = document.getElementById('status-msg');
+
     loadBtn.addEventListener('click', async () => {
         const url = sheetUrlInput.value.trim();
+        statusMsg.textContent = '';
+        statusMsg.className = 'status-message';
+
         if (!url) {
-            alert("Please enter a Google Sheet URL");
+            showStatus("Please enter a Google Sheet URL", 'error');
             return;
         }
 
@@ -16,33 +21,42 @@ export default function initData(state) {
             loadBtn.disabled = true;
 
             const csvUrl = convertToExportUrl(url);
+            // Log for debugging (user can check console if stuck)
+            console.log("Fetching CSV from:", csvUrl);
+
             const data = await fetchAndParseCsv(csvUrl);
 
             if (data.length === 0) {
-                throw new Error("No data found or invalid format.");
+                throw new Error("No data found. Check your sheet has 'Question' and 'Answer' columns.");
             }
 
             state.deck = data;
             console.log("Deck loaded:", state.deck);
 
-            // Dispatch event or call UI update directly
-            // For now, let's just switch view
             dashboardView.classList.add('hidden');
             dashboardView.classList.remove('active');
             appView.classList.remove('hidden');
             appView.classList.add('active');
 
-            // Trigger mode initialization (we'll do this better in UI module)
             document.dispatchEvent(new CustomEvent('deckLoaded', { detail: state.deck }));
 
         } catch (error) {
             console.error(error);
-            alert("Failed to load deck: " + error.message);
+            let msg = error.message;
+            if (msg.includes("Failed to fetch")) {
+                msg = "Connection blocked. Did you 'Publish to web'? See instructions below.";
+            }
+            showStatus(msg, 'error');
         } finally {
             loadBtn.textContent = 'Load Deck';
             loadBtn.disabled = false;
         }
     });
+
+    function showStatus(msg, type) {
+        statusMsg.textContent = msg;
+        statusMsg.className = `status-message ${type}`;
+    }
 
     function convertToExportUrl(url) {
         // Simple regex to find /edit and replace with /export?format=csv

@@ -25,8 +25,13 @@
                     <input type="text" id="sheet-url" placeholder="Paste Google Sheet URL here...">
                     <button id="load-btn" class="primary-btn">Load Deck</button>
                 </div>
-                <p class="hint">Make sure your sheet is public ("Anyone with the link can view") and has header rows:
-                    Question, Answer.</p>
+                <div id="status-msg" class="status-message"></div>
+                <p class="hint">
+                    <strong>Important:</strong> In Google Sheets, go to <strong>File > Share > Publish to web</strong>.
+                    Select "Entire Document" and "Comma-separated values (.csv)", then click Publish.
+                    Copy that link (or the regular edit link) and paste it above.<br>
+                    Review the <a href="README.md">User Guide</a> for details.
+                </p>
             </main>
         </section>
 
