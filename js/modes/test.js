@@ -103,7 +103,8 @@ export default function initTest(state, container) {
         resultsContainer.classList.remove('hidden');
 
         document.getElementById('retry-btn').addEventListener('click', () => {
-            initTest(state, container); // Restart
+            const testBtn = document.querySelector('.mode-btn[data-mode="test"]');
+            if (testBtn) testBtn.click();
         });
 
         // Scroll to results
