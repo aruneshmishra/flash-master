@@ -9,34 +9,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div id="app">
-        <!-- Login View -->
-        <section id="login-view" class="view active">
-            <div class="login-container">
-                <h1>FlashMaster</h1>
-                <p>Master any subject with flashcards, tests, and games.</p>
-                <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID" data-callback="handleCredentialResponse"
-                    data-auto_prompt="false">
-                </div>
-                <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
-                    data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
-                </div>
-            </div>
-        </section>
-
         <!-- Dashboard / Data Input View -->
-        <section id="dashboard-view" class="view hidden">
+        <section id="dashboard-view" class="view active">
             <header>
-                <div class="user-profile">
-                    <img id="user-avatar" src="" alt="Profile">
-                    <span id="user-name"></span>
-                    <button id="logout-btn">Logout</button>
-                </div>
+                <h1>FlashMaster</h1>
             </header>
             <main class="dashboard-content">
                 <h2>Load Your Deck</h2>

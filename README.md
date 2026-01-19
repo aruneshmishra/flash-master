@@ -4,7 +4,6 @@
 
 ## Features
 
-- **Google Authentication**: Securely sign in with your Google account.
 - **Dynamic Data Loading**: Load flashcard decks directly from any public Google Sheet.
 - **Four Study Modes**:
   - **🃏 Flashcards**: Classic study mode with 3D flip animations.
@@ -21,17 +20,7 @@
    cd flash-master
    ```
 
-2. **Configure Google Sign-In**
-   - This app uses Google Identity Services. You will need a Google Cloud Project with OAuth 2.0 credentials.
-   - Open `index.html`.
-   - Find the line:
-     ```html
-     <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID" ...>
-     ```
-   - Replace `YOUR_GOOGLE_CLIENT_ID` with your actual Google Client ID.
-   - *Note: Ensure your `origin` (e.g., `http://localhost:3000` or your deployment URL) is added to your Authorized Javascript Origins in the Google Cloud Console.*
-
-3. **Run the Application**
+2. **Run the Application**
    - You can serve the files using any static file server.
    - **Using Python:**
      ```bash
@@ -51,9 +40,8 @@ FlashMaster loads decks from Google Sheets.
 5. Copy the URL.
 
 ### 2. Loading a Deck
-1. Sign in with Google.
-2. In the Dashboard view, paste your **Google Sheet URL** into the input field.
-3. Click **Load Deck**.
+1. Paste your **Google Sheet URL** into the input field on the home screen.
+2. Click **Load Deck**.
 
 ### 3. Study Modes
 
