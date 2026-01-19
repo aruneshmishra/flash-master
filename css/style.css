@@ -610,3 +610,22 @@ input[type="text"]:focus {
         grid-template-columns: repeat(3, 1fr);
     }
 }
+/* Footer */
+.app-footer {
+    margin-top: auto;
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding-top: 20px;
+    width: 100%;
+}
+
+.app-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.app-footer a:hover {
+    text-decoration: underline;
+}
