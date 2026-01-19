@@ -55,8 +55,8 @@ export default function initLearn(state, container) {
 
         // Re-attach listeners
         const btns = wrapper.querySelectorAll('.option-btn');
-        const feedback = wrapper.getElementById('feedback-msg');
-        const nextBtn = wrapper.getElementById('next-learn-btn');
+        const feedback = wrapper.querySelector('#feedback-msg');
+        const nextBtn = wrapper.querySelector('#next-learn-btn');
 
         btns.forEach(btn => {
             btn.addEventListener('click', (e) => {
