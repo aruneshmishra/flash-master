@@ -80,6 +80,34 @@ header {
     padding-bottom: 20px;
     border-bottom: 1px solid var(--border-color);
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    /* Allow wrapping for subtitle */
+}
+
+/* App View specific header tweaks */
+#app-view header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 0 15px;
+}
+
+#back-to-dashboard {
+    grid-row: 1 / span 2;
+}
+
+#deck-title {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.deck-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.2;
 }
 
 .user-profile {

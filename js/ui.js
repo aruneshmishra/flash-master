@@ -19,11 +19,17 @@ export default function initUI(state) {
     // Listen for Deck Data
     document.addEventListener('deckLoaded', (e) => {
         const { title } = e.detail;
+        const titleEl = document.getElementById('deck-title');
+        const filenameEl = document.getElementById('deck-filename');
+
+        titleEl.textContent = 'Current Deck';
+
         if (title && title !== 'Current Deck') {
-            document.getElementById('deck-title').textContent = `Current Deck - ${title}`;
+            filenameEl.textContent = title;
         } else {
-            document.getElementById('deck-title').textContent = 'Current Deck';
+            filenameEl.textContent = '';
         }
+
         // Initialize default mode
         switchMode('flashcards');
     });
