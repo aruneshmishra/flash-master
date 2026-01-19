@@ -24,21 +24,26 @@ export default function initData(state) {
             // Log for debugging (user can check console if stuck)
             console.log("Fetching CSV from:", csvUrl);
 
-            const data = await fetchAndParseCsv(csvUrl);
+            const { data, title } = await fetchAndParseCsv(csvUrl);
 
             if (data.length === 0) {
                 throw new Error("No data found. Check your sheet has 'Question' and 'Answer' columns.");
             }
 
             state.deck = data;
-            console.log("Deck loaded:", state.deck);
+            console.log("Deck loaded:", state.deck.length, "cards. Title:", title);
 
             dashboardView.classList.add('hidden');
             dashboardView.classList.remove('active');
             appView.classList.remove('hidden');
             appView.classList.add('active');
 
-            document.dispatchEvent(new CustomEvent('deckLoaded', { detail: state.deck }));
+            document.dispatchEvent(new CustomEvent('deckLoaded', {
+                detail: {
+                    deck: state.deck,
+                    title: title
+                }
+            }));
 
         } catch (error) {
             console.error(error);
@@ -81,8 +86,30 @@ export default function initData(state) {
         const response = await fetch(url);
         if (!response.ok) throw new Error("Network response was not ok");
 
+        // Try to get filename from Content-Disposition
+        // e.g. attachment; filename="Math.csv"; filename*=UTF-8''Math.csv
+        let title = 'Current Deck';
+        const disposition = response.headers.get('Content-Disposition');
+
+        if (disposition) {
+            // Try to match filename="name.csv"
+            const filenameMatch = disposition.match(/filename="?([^"]+)"?/);
+            if (filenameMatch && filenameMatch[1]) {
+                title = filenameMatch[1].replace(/\.csv$/i, '');
+            } else {
+                // Try filename*=UTF-8''name.csv
+                const utfMatch = disposition.match(/filename\*=UTF-8''([^;]+)/);
+                if (utfMatch && utfMatch[1]) {
+                    title = decodeURIComponent(utfMatch[1]).replace(/\.csv$/i, '');
+                }
+            }
+        }
+
         const text = await response.text();
-        return parseCSV(text);
+        return {
+            data: parseCSV(text),
+            title: title
+        };
     }
 
     function parseCSV(text) {

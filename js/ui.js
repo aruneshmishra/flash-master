@@ -18,6 +18,12 @@ export default function initUI(state) {
 
     // Listen for Deck Data
     document.addEventListener('deckLoaded', (e) => {
+        const { title } = e.detail;
+        if (title && title !== 'Current Deck') {
+            document.getElementById('deck-title').textContent = `Current Deck - ${title}`;
+        } else {
+            document.getElementById('deck-title').textContent = 'Current Deck';
+        }
         // Initialize default mode
         switchMode('flashcards');
     });
