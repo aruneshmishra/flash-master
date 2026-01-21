@@ -7,10 +7,10 @@ export default function initTest(state, container, onNavigate) {
     const testSize = Math.min(10, state.deck.length);
     const testSet = [...state.deck].sort(() => 0.5 - Math.random()).slice(0, testSize);
 
-    // Determine input type for each (randomly mixed)
+    // Determine input type for each (now always multiple choice)
     const questionsWithTypes = testSet.map(item => ({
         ...item,
-        type: Math.random() > 0.5 ? 'text' : 'radio'
+        type: 'radio'
     }));
 
     function renderForm() {
@@ -33,24 +33,21 @@ export default function initTest(state, container, onNavigate) {
 
     function renderQuestion(item, index) {
         let inputHtml = '';
-        if (item.type === 'text') {
-            inputHtml = `<input type="text" name="q${index}" class="test-input" placeholder="Type your answer" autocomplete="off">`;
-        } else {
-            // Generate 3 random distractors
-            const distractors = getRandomDistractors(item.answer);
-            const options = [item.answer, ...distractors].sort(() => 0.5 - Math.random());
 
-            inputHtml = `
-                <div class="radio-options">
-                    ${options.map(opt => `
-                        <label class="radio-label">
-                            <input type="radio" name="q${index}" value="${opt.replace(/"/g, '&quot;')}" required>
-                            <span>${opt}</span>
-                        </label>
-                    `).join('')}
-                </div>
-            `;
-        }
+        // Generate 3 random distractors
+        const distractors = getRandomDistractors(item.answer);
+        const options = [item.answer, ...distractors].sort(() => 0.5 - Math.random());
+
+        inputHtml = `
+            <div class="radio-options">
+                ${options.map(opt => `
+                    <label class="radio-label">
+                        <input type="radio" name="q${index}" value="${opt.replace(/"/g, '&quot;')}" required>
+                        <span>${opt}</span>
+                    </label>
+                `).join('')}
+            </div>
+        `;
 
         return `
             <div class="test-item" data-index="${index}">

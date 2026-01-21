@@ -38,9 +38,8 @@ The classic way to study. Click any card to flip it over and see the answer. Use
 Test your recognition. You will be shown a question and must select the correct answer from multiple choices. The app gives you instant feedback.
 
 ### 📝 Test Mode
-Test your recall. Type the exact answer to the question.
-*   **Text questions**: Type the answer.
-*   **Multiple choice**: Occasionally mixed in for variety.
+Test your recall. You will be tested on 10 random questions from your deck.
+*   **Multiple choice**: Select the correct answer from the options.
 *   Get a score at the end and retry as many times as you like.
 
 ### 🧩 Match Game
