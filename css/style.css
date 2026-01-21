@@ -630,3 +630,23 @@ input[type="text"]:focus {
 .app-footer a:hover {
     text-decoration: underline;
 }
+/* Global override to prevent text truncation */
+.card-content, 
+.match-card, 
+.match-card-content,
+.option-btn, 
+.test-item,
+.test-q-text, 
+.radio-label {
+    white-space: normal !important;
+    text-overflow: unset !important;
+    overflow: visible !important;
+    word-break: break-word;
+    height: auto; /* Allow growth if needed */
+}
+
+/* Adjust match card specific to allow text to fit better */
+.match-card {
+    /* flexible height if needed, though grid constraints apply */
+    min-height: 100%;
+}
