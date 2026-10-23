@@ -1,67 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlashMaster - Learn Anything</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FlashMaster · Study anything from a Google Sheet</title>
+  <meta name="description" content="Free flashcards, adaptive Learn mode, practice tests and a Match game for any Google Sheet. No sign-up.">
+  <meta name="theme-color" content="#0e1020">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='14' width='40' height='40' rx='9' fill='%235b4fe0'/%3E%3Crect x='18' y='6' width='40' height='40' rx='9' fill='%238b7dff'/%3E%3Cpath d='M32 18l-6 13h7l-3 11 11-15h-7l4-9z' fill='%23fff'/%3E%3C/svg%3E">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash. Dark is the default.
+    try { var s = JSON.parse(localStorage.getItem('fm:settings') || '{}'); document.documentElement.dataset.theme = s.theme === 'light' ? 'light' : 'dark'; } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-    <div id="app">
-        <!-- Dashboard / Data Input View -->
-        <section id="dashboard-view" class="view active">
-            <header>
-                <h1>FlashMaster</h1>
-            </header>
-            <main class="dashboard-content">
-                <h2>Load Your Deck</h2>
-                <div class="input-group">
-                    <input type="text" id="sheet-url" placeholder="Paste Google Sheet URL here...">
-                    <button id="load-btn" class="primary-btn">Load Deck</button>
-                </div>
-                <div id="status-msg" class="status-message"></div>
-                <p class="hint">
-                    <strong>Important:</strong> Go to <strong>File > Share > Publish to web</strong> and click Publish.
-                    <br>Then paste the link here. <a href="README.md" target="_blank">Need help?</a>
-                </p>
-            </main>
-        </section>
-
-        <!-- Main App Mode View -->
-        <section id="app-view" class="view hidden">
-            <header>
-                <button id="back-to-dashboard" class="icon-btn">← Back</button>
-                <div class="header-title-container">
-                    <h2 id="deck-title">Current Deck</h2>
-                    <p id="deck-filename" class="deck-subtitle"></p>
-                </div>
-            </header>
-
-            <nav class="mode-switcher">
-                <button data-mode="flashcards" class="mode-btn active">Flashcards</button>
-                <button data-mode="learn" class="mode-btn">Learn</button>
-                <button data-mode="test" class="mode-btn">Test</button>
-                <button data-mode="match" class="mode-btn">Match</button>
-            </nav>
-
-            <main id="mode-container">
-                <!-- Dynamic Content Loaded Here -->
-            </main>
-        </section>
-
-        <footer class="app-footer">
-            By <a href="https://aruneshmishra.github.io/" target="_blank">Arunesh Mishra</a>
-        </footer>
+  <a class="skip-link" href="#view">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="#/" aria-label="FlashMaster home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 64 64"><rect x="6" y="14" width="40" height="40" rx="9" fill="#5b4fe0"/><rect x="18" y="6" width="40" height="40" rx="9" fill="#8b7dff"/><path d="M32 18l-6 13h7l-3 11 11-15h-7l4-9z" fill="#fff"/></svg>
+      </span>
+      <span class="brand-name">FlashMaster</span>
+    </a>
+    <div class="topbar-actions">
+      <button id="keys-btn" class="icon-btn hide-touch" type="button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)"></button>
+      <button id="theme-btn" class="icon-btn" type="button" aria-label="Switch theme"></button>
     </div>
+  </header>
 
-    <!-- Scripts -->
-    <script type="module" src="js/app.js"></script>
+  <main id="view" class="view" aria-live="off"></main>
+
+  <footer class="footer">
+    <span>Made by <a href="https://aruneshmishra.github.io/" target="_blank" rel="noopener">Arunesh Mishra</a></span>
+    <span aria-hidden="true">·</span>
+    <span>Your progress stays on this device</span>
+    <span aria-hidden="true">·</span>
+    <a href="https://github.com/aruneshmishra/flash-master" target="_blank" rel="noopener">Source</a>
+  </footer>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <div id="live-region" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+  <noscript><p class="noscript">FlashMaster needs JavaScript turned on.</p></noscript>
+  <script type="module" src="js/app.js"></script>
 </body>
-
 </html>
