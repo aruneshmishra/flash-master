@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Serve FlashMaster",
+      "detail": "Static server on http://localhost:5173",
+      "type": "shell",
+      "command": "node scripts/serve.js",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "flashmaster",
+        "pattern": { "regexp": "^__never_matches__$" },
+        "background": {
+          "activesBeginsPattern": "^.*$",
+          "beginsPattern": "^.*$",
+          "endsPattern": "FlashMaster running at"
+        }
+      },
+      "presentation": { "reveal": "silent", "panel": "dedicated" }
+    },
+    {
+      "label": "Stop FlashMaster server",
+      "type": "shell",
+      "command": "lsof -ti tcp:5173 | xargs kill 2>/dev/null || true",
+      "presentation": { "reveal": "never" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Unit tests",
+      "type": "shell",
+      "command": "npm run test:unit",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Browser tests (desktop)",
+      "type": "shell",
+      "command": "npx playwright test --project=desktop",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Browser tests (all, headed)",
+      "type": "shell",
+      "command": "npx playwright test --headed --workers=1",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
