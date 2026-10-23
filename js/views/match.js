@@ -4,6 +4,7 @@ import { confetti } from '../lib/confetti.js';
 import { normalize } from '../lib/grade.js';
 import { studyHeader, activeCards } from './shell.js';
 import { sizeClass } from './flashcards.js';
+import { logStudy } from './streak.js';
 
 const PAIRS = 6;
 const PENALTY_MS = 1000;
@@ -12,7 +13,7 @@ export function renderMatch(ctx) {
   const { root, deck, progress, save, signal } = ctx;
   const page = h('div', { class: 'page study-page match-page' });
   const body = h('div', { class: 'match-body' });
-  page.append(studyHeader(deck, 'match'), body);
+  page.append(studyHeader(deck, 'games'), body);
   root.append(page);
 
   let raf = 0;
@@ -92,6 +93,7 @@ export function renderMatch(ctx) {
   }
 
   function finish(ms) {
+    logStudy(PAIRS);
     cancelAnimationFrame(raf);
     const prev = progress.best?.match;
     const isBest = !prev || ms < prev;

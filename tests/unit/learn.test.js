@@ -95,3 +95,16 @@ test('resumes from saved progress', () => {
   s.startRound();
   assert.deepEqual(s.queue.map((c) => c.id), ['c9']);
 });
+
+test('spell questions mix in with written ones when enabled', () => {
+  const progress = Object.fromEntries(cards.map((c) => [c.id, { level: 1, seen: 1, correct: 1, wrong: 0 }]));
+  const s = new LearnSession({ cards, progress, options: { spell: true }, rng: createRng(11) });
+  const types = new Set();
+  s.startRound();
+  let q;
+  while ((q = s.next())) { types.add(q.type); s.answer(true); }
+  assert.deepEqual([...types].sort(), ['spell', 'written']);
+  const off = new LearnSession({ cards, progress: Object.fromEntries(cards.map((c) => [c.id, { level: 1, seen: 1, correct: 1, wrong: 0 }])), rng: createRng(11) });
+  off.startRound();
+  while ((q = off.next())) { assert.notEqual(q.type, 'spell'); off.answer(true); }
+});

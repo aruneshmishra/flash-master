@@ -4,13 +4,14 @@ const ALIASES = {
   term: ['term', 'terms', 'question', 'questions', 'front', 'word', 'prompt', 'q', 'concept', 'vocab', 'vocabulary'],
   definition: ['definition', 'definitions', 'answer', 'answers', 'back', 'meaning', 'a', 'def', 'explanation', 'translation'],
   image: ['image', 'image url', 'imageurl', 'img', 'picture', 'photo', 'diagram'],
+  hint: ['hint', 'hints', 'clue', 'tip'],
 };
 
 const normHeader = (s) => String(s).toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
 
 /** Find which columns hold term / definition / image. Returns null when row 0 is not a header. */
 export function detectColumns(headerRow) {
-  const cols = { term: -1, definition: -1, image: -1 };
+  const cols = { term: -1, definition: -1, image: -1, hint: -1 };
   headerRow.forEach((cell, idx) => {
     const h = normHeader(cell);
     for (const key of Object.keys(ALIASES)) {
@@ -38,7 +39,7 @@ export function rowsToCards(rows) {
 
   let cols = detectColumns(rows[0]);
   const hasHeader = cols !== null;
-  if (!cols) cols = { term: 0, definition: 1, image: -1 };
+  if (!cols) cols = { term: 0, definition: 1, image: -1, hint: -1 };
   const body = hasHeader ? rows.slice(1) : rows;
 
   const cards = [];
@@ -54,7 +55,8 @@ export function rowsToCards(rows) {
     const count = seen.get(id) || 0;
     seen.set(id, count + 1);
     if (count) id = `${id}-${count}`;
-    cards.push({ id, term, definition, image });
+    const hint = cols.hint >= 0 ? (row[cols.hint] ?? '').trim() : '';
+    cards.push(hint ? { id, term, definition, image, hint } : { id, term, definition, image });
   });
   if (skipped) warnings.push(`${skipped} row${skipped === 1 ? ' was' : 's were'} skipped because the term or definition was empty.`);
   return { cards, warnings, hasHeader };

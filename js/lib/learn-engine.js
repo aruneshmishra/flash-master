@@ -95,7 +95,12 @@ export class LearnSession {
     const level = this.progress[card.id]?.level ?? 0;
     const canMC = this.options.mc && this.cards.length >= 2;
     const wantWritten = this.options.written && (level >= LEVEL.FAMILIAR || !canMC);
-    if (wantWritten) return isTypeable(answer) ? 'written' : 'reveal';
+    if (wantWritten) {
+      if (!isTypeable(answer)) return 'reveal';
+      // Spell: hear the answer read aloud and type it. Mixed in with written questions.
+      if (this.options.spell && answer.length <= 40 && this.rng() < 0.5) return 'spell';
+      return 'written';
+    }
     return canMC ? 'mc' : 'reveal';
   }
 

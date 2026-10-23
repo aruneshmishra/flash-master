@@ -6,6 +6,9 @@ import { confetti } from '../lib/confetti.js';
 import { pick } from '../lib/random.js';
 import { studyHeader, segmented, toggle, masteryBar, activeCards } from './shell.js';
 import { sizeClass } from './flashcards.js';
+import { enroll } from '../lib/srs.js';
+import { hintLink } from './review.js';
+import { logStudy } from './streak.js';
 
 const PRAISE = ['Nice!', 'Great job!', 'You got it!', 'Correct!', 'Awesome!', 'Nailed it!', 'Perfect!', 'Way to go!'];
 const STREAK = { 3: 'Three in a row! 🔥', 5: 'Five in a row, on fire! 🔥', 10: 'Ten in a row! Unstoppable 🚀', 20: 'Twenty streak! Legend 🏆' };
@@ -25,8 +28,17 @@ export function renderLearn(ctx) {
   let onKey = null; // per-screen keyboard handler
   let advanceTimer = null;
 
+  // Spell questions are on by default for decks with a chosen read-aloud language (language decks).
+  const spellAuto = () => ['term', 'definition'].some((s) => deck.lang?.[s] && deck.lang[s] !== 'auto');
+  const spellOn = () => canSpeak() && (prefs.spell ?? spellAuto());
+
   function newSession() {
-    session = new LearnSession({ cards: activeCards(deck, progress, prefs.starredOnly), progress: progress.learn, options: prefs });
+    progress.srs = progress.srs || {};
+    session = new LearnSession({ cards: activeCards(deck, progress, prefs.starredOnly), progress: progress.learn, options: { ...prefs, spell: spellOn() } });
+  }
+
+  function markMastered(card) {
+    if (progress.learn[card.id]?.level >= 2) enroll(progress.srs, card.id);
   }
 
   function topBar() {
@@ -68,6 +80,7 @@ export function renderLearn(ctx) {
     if (!q) return roundDone();
     if (q.type === 'mc') return askMC(q);
     if (q.type === 'written') return askWritten(q);
+    if (q.type === 'spell') return askWritten(q, true);
     return askReveal(q);
   }
 
@@ -98,6 +111,7 @@ export function renderLearn(ctx) {
       promptBlock(q),
       h('p', { class: 'q-instruction' }, `Choose the matching ${q.answerSide}`),
       h('div', { class: 'choices' }, buttons),
+      hintLink(q.card),
       feedback));
     onKey = (e) => {
       const n = Number(e.key);
@@ -106,11 +120,13 @@ export function renderLearn(ctx) {
   }
 
   /* ---------- typed answer ---------- */
-  function askWritten(q) {
+  function askWritten(q, spell = false) {
+    const lang = deck.lang?.[q.answerSide];
+    const listen = () => speak(q.answer, lang);
     const feedback = h('div', { class: 'q-feedback', 'aria-live': 'polite' });
     const input = h('input', {
       class: 'input input-lg answer-input', id: 'answer-input', type: 'text', autocomplete: 'off', autocapitalize: 'off', spellcheck: false,
-      placeholder: `Type the ${q.answerSide}`, 'aria-label': `Type the ${q.answerSide}`,
+      placeholder: spell ? 'Type what you hear' : `Type the ${q.answerSide}`, 'aria-label': spell ? 'Type what you hear' : `Type the ${q.answerSide}`,
     });
     const submitBtn = h('button', { class: 'btn btn-primary', type: 'submit', id: 'answer-submit' }, 'Answer');
     const dontKnow = h('button', { class: 'link-btn', type: 'button', id: 'dont-know', onclick: () => grade(true) }, "Don't know?");
@@ -138,13 +154,17 @@ export function renderLearn(ctx) {
       afterAnswer(feedback, r, q, { allowOverride: !g.correct && !gaveUp, close: g.close });
     }
 
-    screen(h('div', { class: 'q-card panel', 'data-type': 'written' },
+    screen(h('div', { class: 'q-card panel', 'data-type': spell ? 'spell' : 'written' },
       promptBlock(q),
-      h('p', { class: 'q-instruction' }, `Type the ${q.answerSide}`),
+      spell ? h('div', { class: 'spell-row' },
+        h('button', { class: 'btn btn-ghost listen-btn', type: 'button', id: 'listen-btn', onclick: () => { listen(); input.focus(); } }, icon('sound', { size: 20 }), 'Listen again'),
+        h('p', { class: 'q-instruction' }, `Listen and spell the ${q.answerSide}`))
+        : h('p', { class: 'q-instruction' }, `Type the ${q.answerSide}`),
       form,
-      h('div', { class: 'written-extra' }, dontKnow),
+      h('div', { class: 'written-extra' }, dontKnow, hintLink(q.card)),
       feedback));
     setTimeout(() => input.focus(), 30);
+    if (spell) setTimeout(listen, 250);
   }
 
   /* ---------- self check (long answers) ---------- */
@@ -173,7 +193,7 @@ export function renderLearn(ctx) {
     area.append(
       h('p', { class: 'q-instruction' }, `Say or think the ${q.answerSide}, then reveal it.`),
       h('button', { class: 'btn btn-primary', id: 'reveal-btn', onclick: reveal }, 'Reveal answer'));
-    screen(h('div', { class: 'q-card panel', 'data-type': 'reveal' }, promptBlock(q), area, feedback));
+    screen(h('div', { class: 'q-card panel', 'data-type': 'reveal' }, promptBlock(q), hintLink(q.card), area, feedback));
     onKey = (e) => {
       if (stage === 'think' && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); reveal(); }
       else if (stage === 'judge' && (e.key === '1' || e.key === 'ArrowLeft')) judge(false);
@@ -185,6 +205,10 @@ export function renderLearn(ctx) {
   function afterAnswer(feedback, r, q, { allowOverride = false, close = false } = {}) {
     const card = feedback.closest('.q-card');
     card.classList.add(r.correct ? 'answered-right' : 'answered-wrong');
+    card.querySelector('.hint-wrap')?.remove();
+    markMastered(q.card);
+    save();
+    logStudy(1);
     const streakMsg = r.correct && STREAK[session.streak];
     const msg = r.correct ? (streakMsg || (close ? 'Correct! Just a small typo.' : pick(PRAISE))) : pick(ENCOURAGE);
     const levelUp = r.correct && r.after === 2 ? h('span', { class: 'chip chip-mastered' }, 'Mastered ✓') : null;
@@ -193,6 +217,7 @@ export function renderLearn(ctx) {
       class: 'link-btn', id: 'override-btn',
       onclick: () => {
         session.override();
+        markMastered(q.card);
         save();
         card.classList.replace('answered-wrong', 'answered-right');
         feedback.querySelector('.fb-msg').textContent = "Okay, we'll count that as correct.";
@@ -265,6 +290,7 @@ export function renderLearn(ctx) {
         h('div', { class: 'field' }, h('span', { class: 'field-label' }, 'Question types'),
           toggle('Multiple choice', prefs.mc, (v) => { prefs.mc = v; }, 'Pick from 4 options'),
           toggle('Written', prefs.written, (v) => { prefs.written = v; }, 'Type the answer from memory')),
+        canSpeak() ? toggle('Spell (listen and type)', spellOn(), (v) => { prefs.spell = v; }, 'Hear the answer read aloud, then spell it') : null,
         toggle('Shuffle terms', prefs.shuffle, (v) => { prefs.shuffle = v; }),
         toggle('Study starred terms only', prefs.starredOnly, (v) => { prefs.starredOnly = v; }, progress.stars.length ? `${progress.stars.length} starred` : 'No starred terms yet'),
         h('button', {

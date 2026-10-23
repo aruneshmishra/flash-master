@@ -52,7 +52,7 @@ export function removeDeck(id) {
 /* ---------- per-deck progress ---------- */
 
 export function emptyProgress() {
-  return { learn: {}, stars: [], know: [], best: {}, lastStudied: 0 };
+  return { learn: {}, srs: {}, stars: [], know: [], best: {}, lastStudied: 0 };
 }
 
 export function loadProgress(id) {
@@ -68,3 +68,8 @@ export function saveProgress(id, progress) {
 
 export const loadSettings = () => ({ theme: 'dark', ...get('settings', {}) });
 export function saveSettings(patch) { const s = { ...loadSettings(), ...patch }; set('settings', s); return s; }
+
+/* ---------- daily activity (streak + goal), shared across decks ---------- */
+import { emptyActivity } from './activity.js';
+export const loadActivity = () => ({ ...emptyActivity(), ...get('activity', {}) });
+export function saveActivity(a) { set('activity', a); }

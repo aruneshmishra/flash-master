@@ -41,3 +41,16 @@ test('file import and samples', () => {
   assert.ok(openSample('sample-spanish').cards.length >= 16);
   assert.equal(openSample('nope'), null);
 });
+
+test('combine decks: merged cards, stable id, refresh rebuilds', async () => {
+  const { combineDecks } = await import('../../js/lib/deck-service.js');
+  const a = importFromCSVText('x,1\ny,2', 'a.csv');
+  const b = importFromCSVText('y,2\nz,3', 'b.csv');
+  const c = combineDecks([a.id, b.id]);
+  assert.equal(c.cards.length, 3);
+  assert.equal(c.title, 'a + b');
+  assert.equal(combineDecks([b.id, a.id]).id, c.id);
+  const r = await refreshDeck(c);
+  assert.equal(r.changed, false);
+  assert.throws(() => combineDecks([a.id]), /at least two/);
+});

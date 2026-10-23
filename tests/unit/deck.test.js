@@ -31,10 +31,16 @@ test('stable unique ids even for duplicate rows', () => {
   assert.equal(a[0].id, b[1].id);
 });
 test('only one recognised header still works', () => {
-  assert.deepEqual(detectColumns(['Word', 'Notes']), { term: 0, definition: 1, image: -1 });
+  assert.deepEqual(detectColumns(['Word', 'Notes']), { term: 0, definition: 1, image: -1, hint: -1 });
 });
 test('sides', () => {
   const c = { term: 't', definition: 'd' };
   assert.equal(sides(c, 'term').answer, 't');
   assert.equal(sides(c, 'definition').answer, 'd');
+});
+
+test('optional Hint column', () => {
+  const { cards } = rowsToCards([['Term', 'Definition', 'Hint'], ['H2O', 'Water', 'You drink it'], ['NaCl', 'Salt', '']]);
+  assert.equal(cards[0].hint, 'You drink it');
+  assert.equal('hint' in cards[1], false);
 });

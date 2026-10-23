@@ -8,8 +8,12 @@ import { renderFlashcards } from './views/flashcards.js';
 import { renderLearn } from './views/learn.js';
 import { renderTest } from './views/test.js';
 import { renderMatch } from './views/match.js';
+import { renderGames } from './views/games.js';
+import { renderMeteor } from './views/meteor.js';
+import { renderReview } from './views/review.js';
+import { paintStreak, showStreak } from './views/streak.js';
 
-const MODES = { flashcards: renderFlashcards, learn: renderLearn, test: renderTest, match: renderMatch };
+const MODES = { flashcards: renderFlashcards, learn: renderLearn, test: renderTest, games: renderGames, match: renderMatch, meteor: renderMeteor, review: renderReview };
 const root = document.getElementById('view');
 let controller = null;
 let navToken = 0;
@@ -36,6 +40,10 @@ function initChrome() {
   const kb = document.getElementById('keys-btn');
   kb.replaceChildren(icon('keyboard', { size: 20 }));
   kb.addEventListener('click', showShortcuts);
+  paintStreak();
+  document.getElementById('streak-btn').addEventListener('click', showStreak);
+  // A new day may start while the tab is open.
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) paintStreak(); });
   document.addEventListener('keydown', (e) => {
     if (e.key === '?' && !isTyping(e) && !document.querySelector('dialog[open]')) showShortcuts();
   });
@@ -50,6 +58,10 @@ function showShortcuts() {
       h('table', null, row(['Space'], 'Flip card'), row(['←', '→'], 'Previous / next (or sort when tracking)'), row(['S'], 'Star card'), row(['K'], 'Read aloud')),
       h('h3', null, 'Learn'),
       h('table', null, row(['1', '2', '3', '4'], 'Pick an answer'), row(['Enter'], 'Submit / continue'), row(['O'], 'Override: I was right')),
+      h('h3', null, 'Spaced review'),
+      h('table', null, row(['Space'], 'Show answer'), row(['1', '2'], 'Forgot / remembered')),
+      h('h3', null, 'Meteor game'),
+      h('table', null, row(['1', '2', '3', '4'], 'Pick an answer')),
       h('h3', null, 'Anywhere'),
       h('table', null, row(['?'], 'Show this help'))),
     buttons: [{ label: 'Close', value: true, variant: 'primary' }],

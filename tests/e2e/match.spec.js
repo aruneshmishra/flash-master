@@ -4,7 +4,8 @@ import { watchErrors, loadDeck, noHorizontalScroll } from './helpers.js';
 test('match game: wrong pair adds penalty, finishing sets a best time', async ({ page }) => {
   const errs = watchErrors(page);
   await loadDeck(page);
-  await page.click('[data-mode="match"]');
+  await page.click('[data-mode="games"]');
+  await page.click('[data-game="match"]');
   await page.click('#start-match');
   const tiles = page.locator('#match-grid .tile');
   await expect(tiles).toHaveCount(12);

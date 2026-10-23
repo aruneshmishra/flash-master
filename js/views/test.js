@@ -2,6 +2,8 @@ import { h, icon, modal, formatTime, isTyping } from '../lib/dom.js';
 import { buildTest, gradeTest, missedCards, TYPE_LABEL, TYPE_ORDER } from '../lib/test-builder.js';
 import { confetti } from '../lib/confetti.js';
 import { studyHeader, segmented, toggle, activeCards } from './shell.js';
+import { hintLink } from './review.js';
+import { logStudy } from './streak.js';
 
 const LETTERS = 'ABCDEFGH';
 
@@ -136,7 +138,7 @@ export function renderTest(ctx) {
         const input = h('input', { class: 'input written-input', type: 'text', autocomplete: 'off', spellcheck: false, placeholder: `Type the ${q.answerSide}`, 'aria-label': `Answer for ${q.prompt}`,
           oninput: (e) => { answers[qi] = e.target.value; refresh(); },
           onkeydown: (e) => { if (e.key === 'Enter') { e.preventDefault(); const all = [...body.querySelectorAll('.written-input')]; const nx = all[all.indexOf(e.target) + 1]; if (nx) nx.focus(); else body.querySelector('#submit-test')?.focus(); } } });
-        el.append(h('span', { class: 'face-label' }, label), h('p', { class: 'tq-text' }, q.prompt), input);
+        el.append(h('span', { class: 'face-label' }, label), h('p', { class: 'tq-text' }, q.prompt), input, hintLink(q.card));
         sections.push(el);
       }
     });
@@ -176,6 +178,7 @@ export function renderTest(ctx) {
   /* ---------- results ---------- */
   function results(test, answers, elapsed) {
     const g = gradeTest(test, answers);
+    logStudy(g.results.reduce((n, r, i) => n + (r.kind === 'match' ? r.items.filter((x) => x.given).length : (r.given !== null && r.given !== undefined && r.given !== '') ? 1 : 0), 0));
     const prevBest = progress.best?.test;
     progress.best = { ...progress.best, test: Math.max(prevBest ?? 0, g.percent) };
     save();

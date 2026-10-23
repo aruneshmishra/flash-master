@@ -1,5 +1,6 @@
 import { h, icon, toast, modal } from '../lib/dom.js';
-import { refreshDeck, renameDeck, isRemote, sheetInputFor } from '../lib/deck-service.js';
+import { refreshDeck, renameDeck, isRemote, isCombo, sheetInputFor } from '../lib/deck-service.js';
+import { dueCards, enroll, nextDue, describeDue } from '../lib/srs.js';
 import { summarize } from '../lib/learn-engine.js';
 import { speak, canSpeak, LANGUAGES } from '../lib/speech.js';
 import * as store from '../lib/store.js';
@@ -23,20 +24,27 @@ export function renderDeck(ctx) {
     page.replaceChildren();
     const counts = summarize(deck.cards, progress.learn);
     const encId = encodeURIComponent(deck.id);
+    // Mastered cards join spaced review (also covers progress made before review existed).
+    progress.srs = progress.srs || {};
+    let enrolled = false;
+    for (const c of deck.cards) if (progress.learn[c.id]?.level >= 2 && !progress.srs[c.id]) { enroll(progress.srs, c.id); enrolled = true; }
+    if (enrolled) save();
+    const due = dueCards(deck.cards, progress.srs);
+    const upcoming = nextDue(deck.cards, progress.srs);
 
     const titleEl = h('h1', { class: 'deck-title', id: 'deck-title' }, deck.title);
     const editBtn = h('button', { class: 'icon-btn', 'aria-label': 'Rename deck', title: 'Rename', onclick: rename }, icon('edit', { size: 18 }));
 
     const actions = h('div', { class: 'deck-actions' },
       shareUrlFor(deck) ? h('button', { class: 'btn btn-ghost btn-sm', id: 'share-btn', onclick: share }, icon('link', { size: 16 }), 'Share') : null,
-      isRemote(deck) ? h('button', { class: 'btn btn-ghost btn-sm', id: 'refresh-btn', onclick: refresh }, icon('refresh', { size: 16 }), 'Refresh') : null,
+      isRemote(deck) || isCombo(deck) ? h('button', { class: 'btn btn-ghost btn-sm', id: 'refresh-btn', onclick: refresh }, icon('refresh', { size: 16 }), 'Refresh') : null,
       isRemote(deck) ? h('a', { class: 'btn btn-ghost btn-sm', href: sheetInputFor(deck.source), target: '_blank', rel: 'noopener' }, icon('sheet', { size: 16 }), 'Open sheet') : null,
       canSpeak() ? h('button', { class: 'btn btn-ghost btn-sm', onclick: voiceSettings }, icon('sound', { size: 16 }), 'Voice') : null);
 
     const head = h('header', { class: 'deck-head' },
       h('a', { class: 'btn btn-ghost btn-sm back-link', href: '#/' }, icon('back', { size: 18 }), 'All decks'),
       h('div', { class: 'deck-title-row' }, titleEl, editBtn),
-      h('p', { class: 'muted deck-meta' }, `${deck.cards.length} terms`, deck.source.kind === 'sample' ? ' · Sample deck' : ''),
+      h('p', { class: 'muted deck-meta' }, `${deck.cards.length} terms`, deck.source.kind === 'sample' ? ' · Sample deck' : '', isCombo(deck) ? ` · Combined from ${deck.source.ids.length} decks` : ''),
       actions);
 
     const tiles = h('div', { class: 'mode-grid' }, MODES.map((m) => h('a', { class: `mode-tile mode-${m.key}`, href: `#/deck/${encId}/${m.key}`, 'data-mode': m.key },
@@ -50,6 +58,7 @@ export function renderDeck(ctx) {
         h('span', { class: 'big-pct' }, `${pct}%`)),
       masteryBar(counts, { large: true }),
       h('p', { class: 'muted small' }, nextStepText(counts, progress)),
+      !due.length && upcoming ? h('p', { class: 'muted small', id: 'next-review' }, icon('timer', { size: 14 }), ` Next spaced review ${describeDue(upcoming)}`) : null,
       (counts.learning || counts.mastered || progress.stars.length || progress.know.length)
         ? h('button', { class: 'link-btn danger', onclick: resetProgress }, 'Reset progress') : null);
 
@@ -88,7 +97,12 @@ export function renderDeck(ctx) {
 
     const warnings = deck.warnings?.length ? h('div', { class: 'notice warn' }, icon('info', { size: 18 }), deck.warnings.join(' ')) : null;
 
-    page.append(...[head, warnings, tiles].filter(Boolean),
+    const reviewBanner = due.length ? h('a', { class: 'review-banner', id: 'review-banner', href: `#/deck/${encId}/review` },
+      h('span', { class: 'review-banner-icon', 'aria-hidden': 'true' }, '🧠'),
+      h('span', { class: 'review-banner-text' }, h('b', null, `${due.length} card${due.length === 1 ? '' : 's'} due for review`), h('span', { class: 'muted small' }, 'A quick check keeps them in your long-term memory.')),
+      h('span', { class: 'btn btn-primary btn-sm' }, 'Review now', icon('right', { size: 16 }))) : null;
+
+    page.append(...[head, warnings, reviewBanner, tiles].filter(Boolean),
       h('div', { class: 'deck-columns' },
         progressCard,
         h('section', { class: 'panel terms-panel' }, h('div', { class: 'section-head' }, h('h2', null, `Terms in this set (${deck.cards.length})`)), filters, list)));

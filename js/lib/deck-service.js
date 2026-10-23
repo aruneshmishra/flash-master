@@ -86,10 +86,11 @@ export async function getDeck(id) {
 }
 
 export const isRemote = (deck) => ['sheet', 'published', 'csv'].includes(deck?.source?.kind);
-export const needsRefresh = (deck) => isRemote(deck) && Date.now() - (deck.fetchedAt || 0) > REFRESH_AFTER_MS;
+export const needsRefresh = (deck) => (isRemote(deck) || deck?.source?.kind === 'combo') && Date.now() - (deck.fetchedAt || 0) > REFRESH_AFTER_MS;
 
 /** Re-download a sheet deck. Returns { deck, changed }. */
 export async function refreshDeck(deck, fetchImpl) {
+  if (deck?.source?.kind === 'combo') return refreshCombo(deck, fetchImpl);
   if (!isRemote(deck)) return { deck, changed: false };
   const fresh = await importFromSheet(sheetInputFor(deck.source), fetchImpl);
   const sig = (d) => d.cards.map((c) => c.id + c.image).join('|');
@@ -103,3 +104,44 @@ export function renameDeck(deck, title) {
 }
 
 export { SAMPLES };
+
+/* ---------- study several decks together ---------- */
+
+export const isCombo = (deck) => deck?.source?.kind === 'combo';
+
+export function combineDecks(ids) {
+  const decks = ids.map(store.loadDeck).filter(Boolean);
+  if (decks.length < 2) throw new SheetError('Pick at least two decks to study together.', 'combo');
+  const id = `combo-${hash(decks.map((d) => d.id).sort().join('|'))}`;
+  const previous = store.loadDeck(id);
+  const deck = {
+    id,
+    title: previous?.titleIsCustom ? previous.title : decks.map((d) => d.title).join(' + ').slice(0, 80),
+    titleIsCustom: previous?.titleIsCustom || false,
+    source: { kind: 'combo', ids: decks.map((d) => d.id) },
+    cards: mergeCards(decks),
+    warnings: [],
+    lang: decks[0].lang || { term: 'auto', definition: 'auto' },
+    fetchedAt: Date.now(),
+  };
+  store.saveDeck(deck);
+  return deck;
+}
+
+function mergeCards(decks) {
+  const seen = new Set();
+  const out = [];
+  for (const d of decks) for (const c of d.cards) { if (!seen.has(c.id)) { seen.add(c.id); out.push(c); } }
+  return out;
+}
+
+/** Re-download every sheet inside a combined deck, then rebuild it. */
+export async function refreshCombo(deck, fetchImpl) {
+  const members = deck.source.ids.map(store.loadDeck).filter(Boolean);
+  await Promise.all(members.filter(isRemote).map((m) => refreshDeck(m, fetchImpl).catch(() => null)));
+  const fresh = store.loadDeck(deck.id) || deck;
+  const rebuilt = { ...fresh, cards: mergeCards(deck.source.ids.map(store.loadDeck).filter(Boolean)), fetchedAt: Date.now() };
+  store.saveDeck(rebuilt);
+  const sig = (d) => d.cards.map((c) => c.id).join('|');
+  return { deck: rebuilt, changed: sig(rebuilt) !== sig(deck) };
+}

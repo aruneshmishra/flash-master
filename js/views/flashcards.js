@@ -4,6 +4,8 @@ import { speak, canSpeak, stopSpeaking } from '../lib/speech.js';
 import { confetti } from '../lib/confetti.js';
 import { studyHeader, segmented, toggle, starButton, activeCards } from './shell.js';
 import { modal } from '../lib/dom.js';
+import { hintLink } from './review.js';
+import { logStudy } from './streak.js';
 
 export function renderFlashcards(ctx) {
   const { root, deck, progress, save, signal } = ctx;
@@ -47,7 +49,8 @@ export function renderFlashcards(ctx) {
           starButton(card, progress, save))),
       h('div', { class: `face-content${showImg ? ' has-img' : ''}` },
         showImg ? h('img', { src: card.image, alt: '', class: 'face-img', referrerpolicy: 'no-referrer', draggable: false }) : null,
-        h('p', { class: `face-text ${sizeClass(text)}` }, text)));
+        h('p', { class: `face-text ${sizeClass(text)}` }, text),
+        side === 'term' ? hintLink(card) : null));
   }
 
   function draw(direction) {
@@ -141,6 +144,7 @@ export function renderFlashcards(ctx) {
     }
   }
   function next() {
+    if (!prefs.track) logStudy(1);
     if (index < order.length - 1) { index++; flipped = false; draw('right'); announce(`Card ${index + 1} of ${order.length}`); }
     else { finished = true; draw(); }
   }
@@ -148,6 +152,7 @@ export function renderFlashcards(ctx) {
     if (index > 0) { index--; flipped = false; draw('left'); }
   }
   function mark(kind) {
+    logStudy(1);
     const card = order[index];
     results.set(card.id, kind);
     const knowSet = new Set(progress.know);

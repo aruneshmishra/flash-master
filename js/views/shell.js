@@ -4,11 +4,12 @@ export const MODES = [
   { key: 'flashcards', label: 'Flashcards', icon: 'cards', blurb: 'Flip through cards and sort what you know.' },
   { key: 'learn', label: 'Learn', icon: 'learn', blurb: 'Adaptive rounds until you master every term.' },
   { key: 'test', label: 'Test', icon: 'test', blurb: 'A practice test with instant grading.' },
-  { key: 'match', label: 'Match', icon: 'match', blurb: 'Race the clock to pair everything up.' },
+  { key: 'games', label: 'Games', icon: 'match', blurb: 'Match and Meteor: race the clock for fun.' },
 ];
 
 /** Top bar shared by all study modes: back link, deck title, mode switcher. */
 export function studyHeader(deck, active) {
+  if (active === 'match' || active === 'meteor') active = 'games';
   return h('div', { class: 'study-header' },
     h('div', { class: 'study-header-row' },
       h('a', { class: 'btn btn-ghost btn-sm back-link', href: `#/deck/${encodeURIComponent(deck.id)}` }, icon('back', { size: 18 }), h('span', { class: 'back-text' }, 'Deck')),

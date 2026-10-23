@@ -1,5 +1,5 @@
 import { h, icon, toast, modal, timeAgo } from '../lib/dom.js';
-import { importFromSheet, importFromCSVText, openSample, SAMPLES } from '../lib/deck-service.js';
+import { importFromSheet, importFromCSVText, openSample, combineDecks, SAMPLES } from '../lib/deck-service.js';
 import { toCSV } from '../lib/csv.js';
 import * as store from '../lib/store.js';
 import { summarize } from '../lib/learn-engine.js';
@@ -76,12 +76,43 @@ export function renderHome({ root, navigate }) {
       h('span', { class: 'sample-count' }, `${s.cards.length} terms`)))));
 
   const recent = store.recentDecks();
+  // "Study together": pick two or more decks and study them as one.
+  const selected = new Set();
+  const combinable = recent.filter((d) => d.source?.kind !== 'combo');
+  const togetherBar = h('div', { class: 'together-bar', id: 'together-bar', hidden: true },
+    h('span', { id: 'together-count' }, 'Pick 2 or more decks'),
+    h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: () => setSelecting(false) }, 'Cancel'),
+    h('button', { class: 'btn btn-primary btn-sm', type: 'button', id: 'together-go', disabled: true, onclick: () => {
+      const d = combineDecks([...selected]);
+      navigate(`#/deck/${encodeURIComponent(d.id)}`);
+    } }, 'Study together'));
+  const togetherBtn = combinable.length >= 2 ? h('button', { class: 'btn btn-ghost btn-sm', type: 'button', id: 'together-btn', onclick: () => setSelecting(true) }, icon('cards', { size: 16 }), 'Study together') : null;
+  function setSelecting(on) {
+    selected.clear();
+    document.querySelectorAll('.deck-card').forEach((c) => { c.classList.toggle('selecting', on); c.classList.remove('picked'); const cb = c.querySelector('.pick'); if (cb) cb.checked = false; });
+    togetherBar.hidden = !on;
+    if (togetherBtn) togetherBtn.hidden = on;
+    paintBar();
+  }
+  function paintBar() {
+    const n = selected.size;
+    togetherBar.querySelector('#together-count').textContent = n < 2 ? `Pick 2 or more decks (${n} picked)` : `${n} decks picked`;
+    togetherBar.querySelector('#together-go').disabled = n < 2;
+  }
+
   const recentSection = recent.length ? h('section', { class: 'section' },
-    h('div', { class: 'section-head' }, h('h2', null, 'Jump back in')),
+    h('div', { class: 'section-head' }, h('h2', null, 'Jump back in'), togetherBtn),
+    togetherBar,
     h('div', { class: 'deck-grid' }, recent.map((d) => {
       const prog = store.loadProgress(d.id);
       const counts = summarize(d.cards, prog.learn);
-      const card = h('div', { class: 'deck-card' },
+      const pick = d.source?.kind !== 'combo' ? h('label', { class: 'pick-wrap', title: 'Pick this deck' },
+        h('input', { type: 'checkbox', class: 'pick', 'aria-label': `Pick ${d.title}`, onchange: (e) => {
+          if (e.target.checked) selected.add(d.id); else selected.delete(d.id);
+          card.classList.toggle('picked', e.target.checked);
+          paintBar();
+        } })) : null;
+      const card = h('div', { class: 'deck-card', 'data-deck': d.id }, pick,
         h('a', { class: 'deck-card-link', href: `#/deck/${encodeURIComponent(d.id)}` },
           h('span', { class: 'deck-card-title' }, d.title),
           h('span', { class: 'deck-card-meta' }, `${d.cards.length} terms · ${timeAgo(prog.lastStudied)}`),
@@ -143,7 +174,9 @@ function howTo() {
       h('ul', null,
         h('li', null, h('b', null, 'A · Term'), ': the word, question or front of the card.'),
         h('li', null, h('b', null, 'B · Definition'), ': the meaning, answer or back of the card.'),
-        h('li', null, h('b', null, 'C · Image'), ' (optional): a link to a picture starting with https://')),
+        h('li', null, h('b', null, 'C · Image'), ' (optional): a link to a picture starting with https://'),
+        h('li', null, h('b', null, 'D · Hint'), ' (optional): a clue shown when a student taps Show hint.')),
+      h('p', null, 'Image and Hint need a header row (Term, Definition, Image, Hint) so they can be found.'),
       h('p', null, 'A header row like "Term, Definition" is optional. "Question, Answer" or "Front, Back" work too.'),
       h('h3', null, 'Sharing'),
       h('p', null, 'In Google Sheets click Share → General access → Anyone with the link → Viewer. "File › Share › Publish to web" links work as well.'),

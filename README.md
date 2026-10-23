@@ -11,10 +11,12 @@ Free, no sign-up, nothing to install. Dark mode by default.
 
 1. **Fill in a Google Sheet.** Put the term in column A and the definition in column B.
 
-   | Term | Definition | Image *(optional)* |
-   |------|------------|--------------------|
-   | Photosynthesis | How plants turn sunlight into food | |
-   | Mitochondria | The powerhouse of the cell | https://… |
+   | Term | Definition | Image *(optional)* | Hint *(optional)* |
+   |------|------------|--------------------|-------------------|
+   | Photosynthesis | How plants turn sunlight into food | | Think about leaves |
+   | Mitochondria | The powerhouse of the cell | https://… | |
+
+   Image and Hint columns need a header row so FlashMaster can find them.
 
    The header row is optional. `Term / Definition`, `Question / Answer` and `Front / Back` are all recognised, in any column order.
 2. **Share it.** Click **Share**, set General access to **Anyone with the link**, then **Copy link**. *File › Share › Publish to web* links work too.
@@ -58,8 +60,24 @@ An adaptive mode that keeps going until you know everything.
 * You get your score, time and a full review of every answer.
 * **Retake missed** builds a new test from only the questions you got wrong.
 
-### ⏱️ Match
-Pair six terms with their definitions as fast as you can. A wrong pair adds one second. Beat your best time!
+### 🎮 Games
+* **Match**: pair six terms with their definitions as fast as you can. A wrong pair adds one second.
+* **Meteor**: a word falls from the sky. Pick the right answer before it lands. You have 3 lives and it speeds up as you go.
+
+### 🧠 Spaced review
+Once you master a term in Learn, it joins spaced review. FlashMaster brings it back after 1 day, then 3, 7, 14, 30 and 60 days. Forget it and it starts again from 1 day. When cards are due, the deck page shows a banner like "12 cards due for review".
+
+### 🔊 Spell
+In Learn, spell questions read the answer aloud and you type what you hear. They turn on automatically when you pick a language under **Voice** on the deck page, and you can switch them on or off in Learn options.
+
+### 💡 Hints
+Add a **Hint** column to your sheet. A "Show hint" link then appears on flashcards and in Learn and Test.
+
+### 🔥 Streak and daily goal
+The flame in the top bar shows how many days in a row you have studied. Tap it to set a daily goal of 10, 20, 50 or 100 questions and cards.
+
+### 📚 Study together
+On the home page, press **Study together**, pick two or more decks and study them as one, for example chapters 1 to 3 before an exam.
 
 ---
 
@@ -75,7 +93,7 @@ Students who open it go straight to the deck. Each student's progress is stored 
 
 ## Privacy
 
-There are no accounts and no server. Your sheet is downloaded straight from Google into your browser. Progress, stars and best scores are kept in your browser's local storage on this device.
+There are no accounts and no server. Your sheet is downloaded straight from Google into your browser. Progress, stars, review dates, streaks and best scores are kept in your browser's local storage on this device. They don't move between devices, and clearing your browsing data resets them.
 
 ---
 
@@ -96,7 +114,7 @@ css/style.css
 js/
   app.js               router, theme, shared links
   lib/                 pure logic: csv, sheet, deck, grade, learn-engine, test-builder, store …
-  views/               home, deck, flashcards, learn, test, match
+  views/               home, deck, flashcards, learn, test, review, games, match, meteor, streak
   data/samples.js      built-in sample decks
 tests/unit             node:test specs for the logic
 tests/e2e              Playwright specs that mock Google Sheets
