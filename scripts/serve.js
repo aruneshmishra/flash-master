@@ -7,6 +7,7 @@ const root = resolve(process.cwd());
 const port = Number(process.env.PORT || 5173);
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json', '.md': 'text/markdown; charset=utf-8', '.csv': 'text/csv' };
 
+console.log("Starting FlashMaster...");
 createServer(async (req, res) => {
   try {
     let path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
@@ -19,4 +20,11 @@ createServer(async (req, res) => {
   } catch {
     res.writeHead(404, { 'content-type': 'text/plain' }).end('Not found');
   }
+}).on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    // Another FlashMaster server is already up; reuse it so the debugger can continue.
+    console.log(`FlashMaster running at http://localhost:${port} (already running)`);
+    process.exit(0);
+  }
+  throw err;
 }).listen(port, () => console.log(`FlashMaster running at http://localhost:${port}`));

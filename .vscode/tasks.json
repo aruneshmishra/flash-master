@@ -11,9 +11,8 @@
         "owner": "flashmaster",
         "pattern": { "regexp": "^__never_matches__$" },
         "background": {
-          "activesBeginsPattern": "^.*$",
-          "beginsPattern": "^.*$",
-          "endsPattern": "FlashMaster running at"
+          "beginsPattern": "^Starting FlashMaster",
+          "endsPattern": "^FlashMaster running at"
         }
       },
       "presentation": { "reveal": "silent", "panel": "dedicated" }
