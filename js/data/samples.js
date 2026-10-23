@@ -1,5 +1,8 @@
 /** Built-in decks so anyone can try FlashMaster before making a sheet. */
-const make = (rows) => rows.map(([term, definition], i) => ({ id: `x${i}`, term, definition, image: '' }));
+import { hash } from '../lib/hash.js';
+
+// Ids come from the card text, like sheet decks, so cards stay unique when decks are combined.
+const make = (rows) => rows.map(([term, definition]) => ({ id: hash(`${term}\u0000${definition}`), term, definition, image: '' }));
 
 export const SAMPLES = [
   {

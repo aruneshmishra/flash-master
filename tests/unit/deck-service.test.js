@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeDelimiters, sourceFromId, sheetInputFor, importFromSheet, importFromCSVText, refreshDeck, openSample } from '../../js/lib/deck-service.js';
+import { normalizeDelimiters, sourceFromId, sheetInputFor, importFromSheet, importFromCSVText, refreshDeck, openSample, renameDeck } from '../../js/lib/deck-service.js';
 import { parseCSV } from '../../js/lib/csv.js';
 import { parseSheetUrl, deckIdFor } from '../../js/lib/sheet.js';
 
@@ -53,4 +53,13 @@ test('combine decks: merged cards, stable id, refresh rebuilds', async () => {
   const r = await refreshDeck(c);
   assert.equal(r.changed, false);
   assert.throws(() => combineDecks([a.id]), /at least two/);
+});
+
+test('sample decks keep a custom name and combine without losing cards', async () => {
+  const { combineDecks, getDeck } = await import('../../js/lib/deck-service.js');
+  const a = openSample('sample-space');
+  renameDeck(a, 'Planets');
+  assert.equal((await getDeck('sample-space')).title, 'Planets');
+  openSample('sample-elements');
+  assert.equal(combineDecks(['sample-space', 'sample-elements']).cards.length, 28);
 });

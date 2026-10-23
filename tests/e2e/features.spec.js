@@ -15,7 +15,7 @@ test('streak badge counts study and the daily goal dialog opens', async ({ page 
   await page.click('#streak-btn');
   await expect(page.locator('#streak-days')).toHaveText('1 day');
   await expect(page.locator('dialog')).toContainText('2 / 20 today');
-  await page.locator('dialog').getByRole('radio', { name: '10' }).click();
+  await page.locator('dialog').getByRole('radio', { name: '10', exact: true }).click();
   await page.locator('dialog').getByRole('button', { name: 'Done' }).click();
   await page.reload();
   await page.click('#streak-btn');

@@ -55,7 +55,7 @@ export function openSample(id) {
   if (!s) return null;
   const previous = store.loadDeck(id);
   const deck = {
-    id: s.id, title: s.title, titleIsCustom: false, source: { kind: 'sample' }, cards: s.cards, warnings: [],
+    id: s.id, title: previous?.titleIsCustom ? previous.title : s.title, titleIsCustom: previous?.titleIsCustom || false, source: { kind: 'sample' }, cards: s.cards, warnings: [],
     lang: previous?.lang || s.lang || { term: 'auto', definition: 'auto' }, fetchedAt: Date.now(),
   };
   store.saveDeck(deck);
@@ -77,9 +77,10 @@ export function sheetInputFor(source) {
 }
 
 export async function getDeck(id) {
+  // Samples always come from the built-in data, so updates to them reach every browser.
+  if (findSample(id)) return openSample(id);
   const saved = store.loadDeck(id);
   if (saved) return saved;
-  if (findSample(id)) return openSample(id);
   const src = sourceFromId(id);
   if (src) return importFromSheet(sheetInputFor(src));
   return null;
@@ -110,7 +111,7 @@ export { SAMPLES };
 export const isCombo = (deck) => deck?.source?.kind === 'combo';
 
 export function combineDecks(ids) {
-  const decks = ids.map(store.loadDeck).filter(Boolean);
+  const decks = ids.map(loadMember).filter(Boolean);
   if (decks.length < 2) throw new SheetError('Pick at least two decks to study together.', 'combo');
   const id = `combo-${hash(decks.map((d) => d.id).sort().join('|'))}`;
   const previous = store.loadDeck(id);
@@ -137,11 +138,16 @@ function mergeCards(decks) {
 
 /** Re-download every sheet inside a combined deck, then rebuild it. */
 export async function refreshCombo(deck, fetchImpl) {
-  const members = deck.source.ids.map(store.loadDeck).filter(Boolean);
+  const members = deck.source.ids.map(loadMember).filter(Boolean);
   await Promise.all(members.filter(isRemote).map((m) => refreshDeck(m, fetchImpl).catch(() => null)));
   const fresh = store.loadDeck(deck.id) || deck;
-  const rebuilt = { ...fresh, cards: mergeCards(deck.source.ids.map(store.loadDeck).filter(Boolean)), fetchedAt: Date.now() };
+  const rebuilt = { ...fresh, cards: mergeCards(deck.source.ids.map(loadMember).filter(Boolean)), fetchedAt: Date.now() };
   store.saveDeck(rebuilt);
   const sig = (d) => d.cards.map((c) => c.id).join('|');
   return { deck: rebuilt, changed: sig(rebuilt) !== sig(deck) };
+}
+
+/** A deck inside a combination; samples always come from the built-in data. */
+function loadMember(id) {
+  return findSample(id) ? openSample(id) : store.loadDeck(id);
 }
