@@ -23,6 +23,7 @@ test('loads a Google Sheet, converts link to CSV export, lists terms', async ({ 
   await expect(page.locator('#deck-title')).toBeVisible();
   expect(calls[0]).toBe(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`);
   await expect(page.locator('.term-row')).toHaveCount(CARDS.length + 1);
+  await expect(page.locator("#view")).not.toContainText(/\bnull\b|undefined/);
   await expect(page.locator('.term-row').last()).toContainText('Comma, term');
   await noHorizontalScroll(page);
   // shows in "Jump back in" on the home page

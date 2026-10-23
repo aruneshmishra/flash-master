@@ -88,7 +88,7 @@ export function renderDeck(ctx) {
 
     const warnings = deck.warnings?.length ? h('div', { class: 'notice warn' }, icon('info', { size: 18 }), deck.warnings.join(' ')) : null;
 
-    page.append(head, warnings, tiles,
+    page.append(...[head, warnings, tiles].filter(Boolean),
       h('div', { class: 'deck-columns' },
         progressCard,
         h('section', { class: 'panel terms-panel' }, h('div', { class: 'section-head' }, h('h2', null, `Terms in this set (${deck.cards.length})`)), filters, list)));
